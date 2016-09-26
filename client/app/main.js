@@ -1,10 +1,6 @@
 'use strict';
 
 angular
-	// .module('mean101', [])
-	// .controller('main', function ($scope) {
-	// 	$scope.title = 'MEAN 101 from Angular'
-	// })
 	.module('mean101', ['ngRoute'])
 	.config($routeProvider =>
 		$routeProvider
@@ -23,6 +19,18 @@ angular
 			.then(({data: {title}}) => $scope.title = title)
 	})
 	.controller('ChatCtrl', function($scope, $http) {
+		$scope.sendMessage = () => {
+			const msg = {
+				author: $scope.author,
+				content: $scope.content
+			}
+
+			$http
+				.post('/api/messages', msg)
+				.then(() => $scope.messages.push(msg))
+				.catch(console.error)
+		}
+
 		$http
 			.get('/api/messages') //route
 			.then(({data: {messages}}) => $scope.messages = messages)

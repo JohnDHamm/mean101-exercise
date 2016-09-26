@@ -1,5 +1,6 @@
 'use strict';
 
+const { json } = require('body-parser')
 const express = require('express');
 const mongoose = require('mongoose')
 
@@ -10,6 +11,7 @@ const app = express();
 
 //middlewares
 app.use(express.static('client')) //client folder
+app.use(json())
 
 app.get('/api/title', (req, res) =>
 	res.send({ title: 'MEAN chat' })
@@ -25,7 +27,7 @@ app.get('/api/messages', (req, res, err) =>
 		.find()
 		.then(messages => res.json( {messages} ))
 		.catch(err)
-	// res.json({
+	// res.json({ //hard coding to test
 	// 	messages: [
 	// 		{
 	// 			author: 'John',
@@ -39,7 +41,16 @@ app.get('/api/messages', (req, res, err) =>
 	// })
 )
 
-mongoose.promise = Promise;
+app.post('/api/messages', (req, res, err) => {
+	const msg = req.body
+	Message
+		.create(msg)
+		.then(msg => res.json(msg))
+		.catch(err)
+	}
+)
+
+mongoose.Promise = Promise;
 mongoose.connect(MONGODB_URL, () =>
 	app.listen(PORT, () => console.log(`listening on port: ${PORT}`))
 )
