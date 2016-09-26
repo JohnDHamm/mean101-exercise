@@ -1,0 +1,23 @@
+{
+  "name": "mean101-exercise",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JohnDHamm/mean101-exercise.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JohnDHamm/mean101-exercise/issues"
+  },
+  "homepage": "https://github.com/JohnDHamm/mean101-exercise#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
