@@ -33,13 +33,30 @@ app.get('/api/messages', (req, res, err) =>
 		.catch(err)
 )
 
-app.post('/api/messages', (req, res, err) => {
-	const msg = req.body
-	Message
-		.create(msg)
-		.then(msg => res.status(201).json(msg))
-		.catch(err)
-	}
+app.post('/api/messages', createMessage
+	// (req, res, err) => {
+	// const msg = req.body
+	// Message
+	// 	.create(msg)
+	// 	.then(msg => { //for posting by POSTMAN or non-browser
+	// 		io.emit('newMessage', msg)
+	// 		return msg
+	// 	})
+	// 	.then(msg => res.status(201).json(msg))
+	// 	.catch(err)
+	// }
+)
+
+app.use('/api', (req, res) =>
+  res.status(404).send({ code: 404, status: 'Not Found' })
+)
+
+app.use((req, res) =>
+  res.sendFile(process.cwd() + '/client/index.html')
+)
+
+app.use((err, req, res, next) =>
+  res.status(500).send({ code: 500, status: 'Internal Server Error', detail: err.stack })
 )
 
 mongoose.Promise = Promise;
@@ -48,9 +65,36 @@ mongoose.connect(MONGODB_URL, () =>
 	server.listen(PORT, () => console.log(`listening on port: ${PORT}`))
 )
 
+function createMessage (reqOrMsg, res, next) {
+	const msg = reqOrMsg.body || reqOrMsg
+
+	Message
+		.create(msg)
+		.then(msg => { //for posting by POSTMAN or non-browser
+			io.emit('newMessage', msg)
+			return msg
+		})
+		.then(msg => res && res.status(201).json(msg))
+		.catch(err => {
+			if (next) {
+				return next(err)
+			}
+			console.error(err)
+		})
+}
+
+
 io.on('connection', socket => {
 	console.log(`Socket connected: ${socket.id}`)
 	socket.on('disconnect', () => console.log(`Socket disconnected: ${socket.id}`))
+	socket.on('postMessage', createMessage)
+	// 	msg =>
+	// 	Message
+	// 		.create(msg)
+	// 		// .then(msg => res.status(201).json(msg))
+	// 		.then(msg => io.emit('newMessage', msg))
+	// 		.catch(console.error)
+	// )
 })
 
 

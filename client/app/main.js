@@ -7,7 +7,7 @@ socket.on('disconnect', () => console.log("Socket disconnected"));
 
 angular
 	.module('mean101', ['ngRoute'])
-	.config($routeProvider =>
+	.config(($routeProvider, $locationProvider) => {
 		$routeProvider
 			.when('/', {
 				controller: 'MainCtrl',
@@ -17,7 +17,12 @@ angular
 				controller: 'ChatCtrl',
 				templateUrl: 'partials/chat.html'
 			})
-	)
+
+		$locationProvider.html5Mode({
+      enabled: true,
+      requireBase: false,
+    })
+	})
 	.controller('MainCtrl', function($scope, $http) {
 		$http
 			.get('/api/title') //route
@@ -30,14 +35,25 @@ angular
 				content: $scope.content
 			}
 
+			if ( socket.connected ) {
+				return socket.emit('postMessage', msg)
+			}
+
 			$http
 				.post('/api/messages', msg)
 				.then(() => $scope.messages.push(msg))
 				.catch(console.error)
 		}
 
+		// populate initial messages
 		$http
 			.get('/api/messages') //route
 			.then(({data: {messages}}) => $scope.messages = messages)
+
+		//receive new messages
+		socket.on('newMessage', msg => {
+			$scope.messages.push(msg)
+			$scope.$apply()
+		})
 	})
 
