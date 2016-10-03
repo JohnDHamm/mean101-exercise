@@ -1,5 +1,10 @@
 'use strict';
 
+const socket = io(); //client-side socket connection
+socket.on('connect', () => console.log(`Socket connected: ${socket.id}` ));
+socket.on('disconnect', () => console.log("Socket disconnected"));
+
+
 angular
 	.module('mean101', ['ngRoute'])
 	.config($routeProvider =>
